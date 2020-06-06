@@ -1,15 +1,16 @@
 import store from "../../store";
+import actionNames from "../enums/actionNames";
 
 export function updateLoginUsername(username) {
   store.dispatch({
-    type: "UPDATE_LOGIN_USERNAME",
+    type: actionNames.updateLoginUsername,
     payload: username
   });
 }
 
 export function updateLoginPassword(password) {
   store.dispatch({
-    type: "UPDATE_LOGIN_PASSWORD",
+    type: actionNames.updateLoginPassword,
     payload: password
   });
 }

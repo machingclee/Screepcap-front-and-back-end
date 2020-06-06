@@ -11,32 +11,47 @@ import {
 import AppText from "../components/AppText";
 import SafeArea from "../components/SafeArea";
 import Spacer from "../components/Spacer";
-import colors from "../enums/colors";
 import { useSelector } from "react-redux";
 import LoginSignupForm from "../components/LoginSignupForm";
 import { updateLoginUsername, updateLoginPassword } from "../actions/loginActions";
 import screencap from "../api/screencap";
-import { NODE_ENV, API_URL_PRODUCTION, API_URL_DEVELOPMENT } from "react-native-dotenv";
+import { login, logout } from "../actions/appStatusActions";
+
 import messages from "../enums/messages";
 
 function LoginScreen({ navigation }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const { username, password } = useSelector((state) => {
     return state.loginInfo;
   });
+  const [loginNotSuccess, setLoginNotSuccess] = useState(false);
+
+  const isLoggedIn = useSelector((state) => state.appStatus.isLoggedIn);
 
   const onSubmit = async () => {
     const result = await screencap.post("/auth/login", {
       username: username,
       password: password
     });
-    console.log(result.data);
-    if (result.data.message === messages.success) setIsLoggedIn(true);
+    const token = result.data.token;
+    if (!token) setLoginNotSuccess(true);
+    else {
+      login();
+      navigation.navigate("DictionaryListScreen");
+    }
   };
 
   const navigatorToSignup = () => {
     navigation.navigate("SignupScreen");
+  };
+
+  const buttonText = () => {
+    if (isLoggedIn) {
+      return "Login in successfully";
+    } else if (loginNotSuccess) {
+      return "Try Again";
+    } else {
+      return "Login";
+    }
   };
 
   return (
@@ -53,7 +68,7 @@ function LoginScreen({ navigation }) {
           setUsername={updateLoginUsername}
           setPassword={updateLoginPassword}
           onSubmit={onSubmit}
-          submitButtonTitle={isLoggedIn ? "Login in successfully" : "Login"}
+          submitButtonTitle={buttonText()}
         />
 
         <TouchableOpacity onPress={navigatorToSignup} styel={styles.text}>

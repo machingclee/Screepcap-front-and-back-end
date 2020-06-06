@@ -8,5 +8,6 @@ export default {
   lightGray: "rgba(220,220,220,1)",
   danger: "#ff5252",
   green: "#fbe580",
-  dark: "#0c0c0c"
+  dark: "#0c0c0c",
+  blue: "blue"
 };

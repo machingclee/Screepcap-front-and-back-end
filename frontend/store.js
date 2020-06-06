@@ -1,7 +1,10 @@
 import { createStore, combineReducers } from "redux";
 import loginReducer from "./src/reducers/loginReducer";
+import appStatusReducer from "./src/reducers/appStatusReducer";
+
 const rootReducer = combineReducers({
-  loginInfo: loginReducer
+  loginInfo: loginReducer,
+  appStatus: appStatusReducer
 });
 
 // const store = createStore(

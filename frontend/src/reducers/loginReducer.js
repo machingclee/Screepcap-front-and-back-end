@@ -1,13 +1,15 @@
+import actionNames from "../enums/actionNames";
+
 const initialState = { username: "", password: "" };
 
 export default function loginReducer(state = initialState, action) {
   switch (action.type) {
-    case "UPDATE_LOGIN_USERNAME":
+    case actionNames.updateLoginPassword:
       return {
         ...state,
         username: action.payload
       };
-    case "UPDATE_LOGIN_PASSWORD":
+    case actionNames.updateLoginUsername:
       return {
         ...state,
         password: action.payload
