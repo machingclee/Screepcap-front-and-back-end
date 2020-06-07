@@ -32,8 +32,10 @@ async function getVocabs(req, res) {
     const allVocabs = await Vocab.findAll({
       include: { all: true, nested: true }
     });
-    allVocabs.filter((vocab) => vocab.page.note.user.id === req.user.id);
-    res.json(allVocabs);
+    const filteredVocabs = allVocabs.filter(
+      (vocab) => vocab.page.note.user.id === req.user.id
+    );
+    res.json(filteredVocabs);
   } catch (err) {
     console.log(err);
     res.json({ message: messages.serverError });

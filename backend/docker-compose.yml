@@ -13,19 +13,19 @@ services:
       - screencapdb:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-  screencap_api:
-    build:
-      context: ./
-      dockerfile: Dockerfile-screepcap-express
-    container_name: screencap_api
-    restart: always
-    ports:
-      - "8080:3000"
-    volumes:
-      - type: bind
-        source: ./
-        target: /usr/src/app
-      - /usr/src/app/node_modules
+  # screencap_api:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile-screepcap-express
+  #   container_name: screencap_api
+  #   restart: always
+  #   ports:
+  #     - "8080:3000"
+  #   volumes:
+  #     - type: bind
+  #       source: ./
+  #       target: /usr/src/app
+  #     - /usr/src/app/node_modules
 
 volumes:
   screencapdb:

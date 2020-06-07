@@ -2,12 +2,19 @@ import Sequelize from "sequelize";
 import dotnev from "dotenv";
 dotnev.config();
 
-const { NODE_ENV, DEVELOPMENT_DB_HOST, PRODUCTION_DB_HOST } = process.env;
+const {
+  NODE_ENV,
+  DEVELOPMENT_DB_HOST,
+  PRODUCTION_DB_HOST,
+  DB_USER,
+  DB_PASSWORD
+} = process.env;
 const DB_HOST = NODE_ENV == "development" ? DEVELOPMENT_DB_HOST : PRODUCTION_DB_HOST;
 
 console.log(`NODE_ENV=${NODE_ENV}, DB_HOST is set to ${DB_HOST}`);
+console.log("DB_USER=", DB_USER, "DB_PASSWORD", DB_PASSWORD);
 
-export const sequelize = new Sequelize("screencapdb", "cclee", "cclee", {
+export const sequelize = new Sequelize("screencapdb", DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   port: "5432",
   dialect: "postgres",

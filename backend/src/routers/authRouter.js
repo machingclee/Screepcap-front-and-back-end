@@ -30,6 +30,7 @@ async function login(req, res) {
       const pwIsCorrect = await compare(password, user.password);
       if (pwIsCorrect) res.json({ token: issueJWT(user) });
     } else {
+      console.log(err);
       throw new Error();
     }
   } catch (err) {
@@ -77,6 +78,7 @@ async function registerUser_JWT(req, res) {
         throw new Error();
       }
     } catch (err) {
+      console.log(err);
       res.json({ message: messages.fail });
     }
   } else {
