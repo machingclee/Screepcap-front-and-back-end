@@ -8,30 +8,46 @@ import { issueJWT } from "../Utils/JWT/index";
 
 const router = express.Router();
 
-// router.post(
-//   "/login",
-//   passport.authenticate("local", { failWithError: true }),
-//   errorHandling,
-//   loginSucess
-// );
-
-router.post(
-  "/login",
-  passport.authenticate("jwt", { session: false, failWithError: true }),
-  errorHandling,
-  loginSucess
-);
-
+router.post("/login", login);
 router.post("/register", registerUser_JWT);
 router.post("/checkIdentity", checkIdentity); // testing purpose, this is implemented already in local strategy.
 router.get("/logout", logout);
 
+router.get(
+  "/protected",
+  passport.authenticate("jwt", { session: false, failWithError: true }),
+  errorHandling,
+  (req, res) => {
+    res.json({ message: "authorized" });
+  }
+);
+
+async function login(req, res) {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ where: { username: username } });
+    if (user) {
+      const pwIsCorrect = await compare(password, user.password);
+      if (pwIsCorrect) res.json({ token: issueJWT(user) });
+    } else {
+      throw new Error();
+    }
+  } catch (err) {
+    res.json({ message: messages.incorrectUsernameOrPassword });
+  }
+}
+
 function errorHandling(err, req, res, next) {
-  if (err) res.json({ message: messages.incorrectUsernameOrPassword });
-  else next();
+  if (err) {
+    console.log(err);
+    res.json({ message: messages.fail });
+  } else {
+    next();
+  }
 }
 
 function loginSucess(req, res, next) {
+  console.log(req.session);
   console.log(req.user);
   res.json({ message: messages.success });
 }
@@ -43,6 +59,7 @@ function logout(req, res) {
 
 async function registerUser_JWT(req, res) {
   const { username, password } = req.body;
+  console.log(username, password);
   const existingUser = await User.findOne({ where: { username: username } });
   if (existingUser) {
     res.json({ message: messages.alreadyExists });
@@ -52,9 +69,10 @@ async function registerUser_JWT(req, res) {
     const hash = await hashing(password);
     try {
       const user = (await User.create({ username: username, password: hash })).dataValues;
+      console.log(user);
       if (user) {
-        const jwt = issueJWT(user);
-        res.json({ ...jwt, message: messages.success });
+        const token = issueJWT(user);
+        res.json({ token, message: messages.success });
       } else {
         throw new Error();
       }

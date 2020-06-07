@@ -1,9 +1,10 @@
 import Sequelize, { DataTypes } from "sequelize";
 import { sequelize } from "../database";
 import { compare } from "../../Utils/bcrypt/index";
+import modelNames from "../../enums/modelNames";
 
 const User = sequelize.define(
-  "user",
+  modelNames.USER,
   {
     id: {
       type: Sequelize.INTEGER,

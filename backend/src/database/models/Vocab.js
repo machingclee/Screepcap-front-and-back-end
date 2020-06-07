@@ -1,10 +1,11 @@
 import User from "./User";
 import Sequelize from "sequelize";
 import { sequelize } from "../database";
+import Page from "./Page";
 import modelNames from "../../enums/modelNames";
 
-const Dictionary = sequelize.define(
-  "dictionary",
+const Vocab = sequelize.define(
+  modelNames.VOCAB,
   {
     id: {
       type: Sequelize.INTEGER,
@@ -12,12 +13,20 @@ const Dictionary = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-
-    pageId: {
+    sqliteId: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
-    vocab: {
+    // sqlitePageId: {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: false
+    //   // references: {
+    //   //   model: Page,
+    //   //   key: "sqliteId"
+    //   // }
+    // },
+    word: {
       type: Sequelize.STRING,
       allowNull: false,
       defaultValue: ""
@@ -36,11 +45,6 @@ const Dictionary = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       defaultValue: 0
-    },
-    image: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      defaultValue: ""
     }
   },
   {
@@ -48,6 +52,7 @@ const Dictionary = sequelize.define(
   }
 );
 
-Dictionary.belongsTo(User);
+// an additional column sqlitePageId will be created
+Vocab.belongsTo(Page, { foreignKey: "sqlitePageId", targetKey: "sqliteId" });
 
-export default Dictionary;
+export default Vocab;

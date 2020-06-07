@@ -1,11 +1,12 @@
-import User from "./models/User";
-import Dictionary from "./models/Dictionary";
+import "./models/User";
+import "./models/Vocab";
+import "./models/Note";
+import "./models/Page";
+
 import { sequelize as db } from "./database";
 
 export function syncDbs() {
-  db.sync({ force: true, alter: true }).then(() => {});
+  db.sync({ alter: true }).then(() => {});
 }
-
-console.log(db.models.user);
 
 // syncDbs();

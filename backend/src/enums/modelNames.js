@@ -1,4 +1,7 @@
 export default {
   USER: "user",
-  DICTIONARY: "dictionary"
+  DICTIONARY: "dictionary",
+  PAGE: "page",
+  NOTE: "note",
+  VOCAB: "vocab"
 };
