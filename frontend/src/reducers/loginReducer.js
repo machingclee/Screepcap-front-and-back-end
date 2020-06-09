@@ -14,6 +14,7 @@ export default function loginReducer(state = initialState, action) {
         ...state,
         password: action.payload
       };
+
     default:
       return state;
   }

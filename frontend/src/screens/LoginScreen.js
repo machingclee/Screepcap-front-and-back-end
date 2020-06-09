@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -13,9 +13,11 @@ import SafeArea from "../components/SafeArea";
 import Spacer from "../components/Spacer";
 import { useSelector } from "react-redux";
 import LoginSignupForm from "../components/LoginSignupForm";
+import Background from "../components/Background";
 import { updateLoginUsername, updateLoginPassword } from "../actions/loginActions";
 import screencap from "../api/screencap";
-import { login, logout } from "../actions/appStatusActions";
+import { login, logout, setToken } from "../actions/appStatusActions";
+import colors from "../enums/colors";
 
 import messages from "../enums/messages";
 
@@ -23,6 +25,7 @@ function LoginScreen({ navigation }) {
   const { username, password } = useSelector((state) => {
     return state.loginInfo;
   });
+
   const [loginNotSuccess, setLoginNotSuccess] = useState(false);
 
   const isLoggedIn = useSelector((state) => state.appStatus.isLoggedIn);
@@ -36,7 +39,8 @@ function LoginScreen({ navigation }) {
     if (!token) setLoginNotSuccess(true);
     else {
       login();
-      navigation.navigate("DictionaryListScreen");
+      setToken(token);
+      navigation.navigate("NoteListScreen");
     }
   };
 
@@ -44,38 +48,33 @@ function LoginScreen({ navigation }) {
     navigation.navigate("SignupScreen");
   };
 
-  const buttonText = () => {
-    if (isLoggedIn) {
-      return "Login in successfully";
-    } else if (loginNotSuccess) {
-      return "Try Again";
-    } else {
-      return "Login";
-    }
-  };
-
   return (
-    <ImageBackground
-      source={require("../assets/images/toBeBlured.jpg")}
-      style={styles.background}
-      blurRadius={100}
-    >
+    <Background>
       <SafeArea style={styles.safeContainer}>
         <Spacer height={10} />
         <Image source={require("../assets/images/book.png")} style={styles.book} />
-
+        <AppText
+          style={{
+            alignSelf: "center",
+            height: 20,
+            justifyContent: "center",
+            color: colors.tomato
+          }}
+        >
+          {loginNotSuccess ? "Incorrect username or password" : ""}
+        </AppText>
         <LoginSignupForm
           setUsername={updateLoginUsername}
           setPassword={updateLoginPassword}
           onSubmit={onSubmit}
-          submitButtonTitle={buttonText()}
+          submitButtonTitle={"Login"}
         />
 
         <TouchableOpacity onPress={navigatorToSignup} styel={styles.text}>
           <AppText style={styles.text}>You may click me to sign up.</AppText>
         </TouchableOpacity>
       </SafeArea>
-    </ImageBackground>
+    </Background>
   );
 }
 
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
   text: {
     alignSelf: "flex-end",
     marginHorizontal: 10,
-    color: "blue"
+    color: colors.mediumBlue
   }
 });
 

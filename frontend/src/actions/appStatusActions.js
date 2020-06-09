@@ -12,3 +12,31 @@ export function logout() {
     type: actionNames.logout
   });
 }
+
+export function setToken(token) {
+  store.dispatch({
+    type: actionNames.setToken,
+    payload: token
+  });
+}
+
+export function setVocabs(vocabs) {
+  store.dispatch({
+    type: actionNames.setVocabs,
+    payload: vocabs
+  });
+}
+
+export function setPages(pages) {
+  store.dispatch({
+    type: actionNames.setPages,
+    payload: pages
+  });
+}
+
+export function setNotes(notes) {
+  store.dispatch({
+    type: actionNames.setNotes,
+    payload: notes
+  });
+}

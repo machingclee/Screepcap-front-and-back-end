@@ -11,13 +11,26 @@ import SafeArea from "../components/SafeArea";
 import AppText from "../components/AppText";
 import Spacer from "../components/Spacer";
 import LoginSignupForm from "../components/LoginSignupForm";
+import Background from "../components/Background";
+import screencap from "../api/screencap";
+import { updateLoginUsername } from "../actions/loginActions";
+
+import messages from "../enums/messages";
+import colors from "../enums/colors";
 
 function SignupScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const onSubmit = () => {
-    console.log("username", username, "password", password);
+  const onSubmit = async () => {
+    const result = await screencap.post("/auth/register", { username, password });
+
+    if (result.data.message == messages.success) {
+      updateLoginUsername(username);
+      navigation.navigate("LoginScreen");
+    } else {
+      navigation.navigate("LoginScreen");
+    }
   };
 
   const navigatorToLogin = () => {
@@ -28,11 +41,7 @@ function SignupScreen({ navigation }) {
   };
 
   return (
-    <ImageBackground
-      source={require("../assets/images/toBeBlured.jpg")}
-      style={styles.background}
-      blurRadius={100}
-    >
+    <Background>
       <SafeArea style={styles.safeContainer}>
         <Spacer height={10} />
         <Image source={require("../assets/images/book.png")} style={styles.book} />
@@ -50,7 +59,7 @@ function SignupScreen({ navigation }) {
           </AppText>
         </TouchableOpacity>
       </SafeArea>
-    </ImageBackground>
+    </Background>
   );
 }
 
@@ -77,7 +86,7 @@ const styles = StyleSheet.create({
   text: {
     alignSelf: "flex-end",
     marginHorizontal: 10,
-    color: "blue"
+    color: colors.mediumBlue
   }
 });
 

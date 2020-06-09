@@ -1,7 +1,7 @@
 export default {
   primary: "#fc5c65",
   secondary: "#4ecdc4",
-  tomoto: "tomato",
+  tomato: "tomato",
   black: "black",
   white: "white",
   medium: "#6e6969",
@@ -9,5 +9,12 @@ export default {
   danger: "#ff5252",
   green: "#fbe580",
   dark: "#0c0c0c",
-  blue: "blue"
+  blue: "blue",
+  mediumBlue: "#8B8DAF",
+  lightBlue: "#F9F9FA",
+  deepBrown: "#B0A484",
+  dictBorder: "rgba(255,100,100,0.8)",
+  brightBrown: "rgba(255,240,240,0.6)",
+  bottomTabBar: "rgba(255,240,240,0.97)",
+  lowOpaBrightBrown: "rgba(249,247,240,0.8)"
 };

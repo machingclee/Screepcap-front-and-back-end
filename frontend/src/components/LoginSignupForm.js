@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, SafeAreaView, Image } from "react-native";
 import Spacer from "./Spacer";
 import AppButton from "../components/AppButton";
 import AppTextInput from "../components/AppTextInput";
-
-function LoginSignupForm({ setUsername, setPassword, onSubmit, submitButtonTitle }) {
+import colors from "../enums/colors";
+function LoginSignupForm({
+  setUsername,
+  setPassword,
+  onSubmit,
+  submitButtonTitle,
+  username
+}) {
   return (
     <View style={styles.container}>
       <Spacer height={5} />
@@ -24,7 +30,7 @@ function LoginSignupForm({ setUsername, setPassword, onSubmit, submitButtonTitle
       <Spacer height={10} />
       <AppButton
         title={submitButtonTitle}
-        color={"red"}
+        color={colors.deepBrown}
         style={styles.button}
         onPress={onSubmit}
       />
