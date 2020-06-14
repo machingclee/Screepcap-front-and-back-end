@@ -26,6 +26,14 @@ export const sequelize = new Sequelize("screencapdb", DB_USER, DB_PASSWORD, {
   }
 });
 
+export async function query(string) {
+  const result = sequelize.query(string.replace(/\n\s*/g, " "), {
+    type: sequelize.QueryTypes.SELECT
+  });
+
+  return result;
+}
+
 sequelize
   .authenticate()
   .then(() => {
@@ -34,3 +42,8 @@ sequelize
   .catch((err) => {
     console.error("Unable to connect to the database:", err);
   });
+
+export const db = {
+  sequelize,
+  query
+};

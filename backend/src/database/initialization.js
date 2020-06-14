@@ -6,7 +6,7 @@ import "./models/Page";
 import { sequelize as db } from "./database";
 
 export function syncDbs() {
-  db.sync({ alter: true }).then(() => {});
+  db.sync({ force: true, alter: true }).then(() => {});
 }
 
 // syncDbs();

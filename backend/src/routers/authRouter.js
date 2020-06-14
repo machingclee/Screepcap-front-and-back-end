@@ -5,6 +5,7 @@ import User from "../database/models/User";
 import messages from "../enums/messages";
 import passport from "passport";
 import { issueJWT } from "../Utils/JWT/index";
+import { authServices } from "../services/authServices";
 
 const router = express.Router();
 
@@ -28,9 +29,11 @@ async function login(req, res) {
     const user = await User.findOne({ where: { username: username } });
     if (user) {
       const pwIsCorrect = await compare(password, user.password);
-      if (pwIsCorrect) res.json({ token: issueJWT(user) });
+
+      if (pwIsCorrect)
+        res.json({ token: issueJWT(user), nickname: user.nickname, email: user.email });
+      else throw new Error();
     } else {
-      console.log(err);
       throw new Error();
     }
   } catch (err) {
@@ -59,8 +62,7 @@ function logout(req, res) {
 }
 
 async function registerUser_JWT(req, res) {
-  const { username, password } = req.body;
-  console.log(username, password);
+  const { username, password, nickname, email } = req.body;
   const existingUser = await User.findOne({ where: { username: username } });
   if (existingUser) {
     res.json({ message: messages.alreadyExists });
@@ -69,10 +71,17 @@ async function registerUser_JWT(req, res) {
   if (!existingUser) {
     const hash = await hashing(password);
     try {
-      const user = (await User.create({ username: username, password: hash })).dataValues;
+      const user = (
+        await User.create({
+          username: username,
+          password: hash,
+          nickname: nickname,
+          email: email
+        })
+      ).dataValues;
       console.log(user);
       if (user) {
-        const token = issueJWT(user);
+        const token = authServices.issueJWT(user);
         res.json({ token, message: messages.success });
       } else {
         throw new Error();

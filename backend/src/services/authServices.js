@@ -1,5 +1,6 @@
 import User from "../database/models/User";
-import { compare } from "../Utils/bcrypt";
+import { compare } from "../Utils/bcrypt/index";
+import jwt from "jsonwebtoken";
 
 async function checkUserIdentity(username, password) {
   const user = (await User.findOne({ where: { username: username } })).dataValues;
@@ -12,3 +13,16 @@ async function checkUserIdentity(username, password) {
 }
 
 export { checkUserIdentity };
+
+function issueJWT(user) {
+  const payload = { id: user.id };
+  const expiresIn = process.env.TOKEN_EXPIRE_IN;
+  const token = jwt.sign(payload, process.env.PRIVATE_KEY, {
+    expiresIn: expiresIn
+  });
+  return token;
+}
+
+export const authServices = {
+  issueJWT
+};
