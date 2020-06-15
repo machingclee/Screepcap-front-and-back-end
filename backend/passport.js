@@ -53,10 +53,14 @@ const localStrategy = new LocalStrategy(localStrategyVerifyCallBack);
 passport.use(localStrategy);
 */
 
+//user is retrieved from the JWT callback above, and serializedUser is used to determine what should be saved in the session variable,
+// the id is saved at req.session.passport.user = {id: '..'}
 passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
+// once after seriallizeUser is called, the user id is then used to retrieve the user object and saved in req.user.
+// {id: 111222} is the only data saved in the session, not the whole user object.
 passport.deserializeUser(function (id, done) {
   User.findOne({ where: { id: id } }).then((user) => {
     try {

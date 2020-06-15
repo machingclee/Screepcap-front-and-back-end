@@ -6,6 +6,9 @@
       {
         "useBuiltIns": true
       }
-    ]
+    ],
+    ["transform-runtime", {
+      "regenerator": true
+    }]
   ]
 }

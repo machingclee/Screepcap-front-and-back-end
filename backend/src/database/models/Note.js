@@ -1,7 +1,7 @@
 import User from "./User";
 import Sequelize from "sequelize";
 import { sequelize } from "../database";
-import modelNames from "../../enums/modelNames";
+import { modelNames } from "../../enums/modelNames";
 
 const Note = sequelize.define(
   modelNames.NOTE,

@@ -23,6 +23,11 @@ function issueJWT(user) {
   return token;
 }
 
+async function saveToken({ user, token }) {
+  await User.update({ push_notification_token: token }, { where: { id: user.id } });
+}
+
 export const authServices = {
-  issueJWT
+  issueJWT,
+  saveToken
 };

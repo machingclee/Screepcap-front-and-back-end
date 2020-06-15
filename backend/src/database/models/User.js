@@ -1,7 +1,7 @@
 import Sequelize, { DataTypes } from "sequelize";
 import { sequelize } from "../database";
 import { compare } from "../../Utils/bcrypt/index";
-import modelNames from "../../enums/modelNames";
+import { modelNames } from "../../enums/modelNames";
 
 const User = sequelize.define(
   modelNames.USER,
@@ -28,6 +28,10 @@ const User = sequelize.define(
     nickname: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    push_notification_token: {
+      type: Sequelize.STRING,
+      allowNull: true
     }
   },
   {

@@ -1,6 +1,6 @@
 import Sequelize from "sequelize";
 import { sequelize } from "../database";
-import modelNames from "../../enums/modelNames";
+import { modelNames } from "../../enums/modelNames";
 import Note from "./Note";
 
 const Page = sequelize.define(

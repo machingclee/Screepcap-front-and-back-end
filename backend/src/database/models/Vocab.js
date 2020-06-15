@@ -2,7 +2,7 @@ import User from "./User";
 import Sequelize from "sequelize";
 import { sequelize } from "../database";
 import Page from "./Page";
-import modelNames from "../../enums/modelNames";
+import { modelNames } from "../../enums/modelNames";
 
 const Vocab = sequelize.define(
   modelNames.VOCAB,

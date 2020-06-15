@@ -9,19 +9,36 @@ import { authServices } from "../services/authServices";
 
 const router = express.Router();
 
+const passportJWTAuthentication = passport.authenticate("jwt", {
+  session: false,
+  failWithError: true
+});
+
 router.post("/login", login);
 router.post("/register", registerUser_JWT);
-router.post("/checkIdentity", checkIdentity); // testing purpose, this is implemented already in local strategy.
-router.get("/logout", logout);
+router.post("/saveToken", passportJWTAuthentication, saveToken);
 
-router.get(
-  "/protected",
-  passport.authenticate("jwt", { session: false, failWithError: true }),
-  errorHandling,
-  (req, res) => {
-    res.json({ message: "authorized" });
+router.get("/logout", logout);
+router.get("/protected", passportJWTAuthentication, errorHandling, sendAuthorized);
+
+router.post("/checkIdentity", checkIdentity);
+
+async function saveToken(req, res) {
+  const { token } = req.body;
+  const user = req.user;
+  try {
+    await authServices.saveToken({ user, token });
+    res.json({ message: messages.success });
+  } catch (err) {
+    console.log(err);
+    res.json({ message: messages.fail });
   }
-);
+}
+
+async function sendAuthorized(req, res) {
+  console.log(req.user);
+  res.json({ message: "authorized" });
+}
 
 async function login(req, res) {
   const { username, password } = req.body;
