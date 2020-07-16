@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "ScreenCapSync",
-    "slug": "ScreenCapSync",
+    "name": "ScreenCap-Dictionary",
+    "slug": "ScreenCap-Dictionary",
+
     "platforms": [
       "ios",
       "android",
@@ -12,7 +13,7 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
@@ -24,6 +25,9 @@
     "ios": {
       "supportsTablet": true
     },
-    "description": ""
+    "description": "",
+    "notification": {
+      "iosDisplayInForeground": true
+    }
   }
 }

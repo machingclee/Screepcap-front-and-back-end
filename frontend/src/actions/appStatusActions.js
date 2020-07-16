@@ -7,19 +7,6 @@ export function login() {
   });
 }
 
-export function logout() {
-  store.dispatch({
-    type: actionNames.logout
-  });
-}
-
-export function setToken(token) {
-  store.dispatch({
-    type: actionNames.setToken,
-    payload: token
-  });
-}
-
 export function setVocabs(vocabs) {
   store.dispatch({
     type: actionNames.setVocabs,

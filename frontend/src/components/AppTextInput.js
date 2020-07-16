@@ -9,12 +9,12 @@ function AppTextInput({ icon, style, ...otherProps }) {
     <View style={styles.container}>
       {icon && <MaterialCommunityIcons name={icon} style={styles.icon} size={24} />}
       <TextInput
-        style={[styles.input, style]}
+        style={[styles.input, { paddingLeft: icon ? null : 10 }, style]}
         autoCompleteType="off"
         autoCorrect={false}
         autoCapitalize="none"
         {...otherProps}
-        placeholderTextColor={"rgba(0,0,0,0.8)"}
+        placeholderTextColor={"rgba(0,0,0,0.5)"}
       />
     </View>
   );

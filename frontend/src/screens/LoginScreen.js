@@ -1,78 +1,113 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
-  View,
   Image,
-  ImageBackground,
-  Text,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
+import { loginAction } from "../actions/loginActions";
 
 import AppText from "../components/AppText";
 import SafeArea from "../components/SafeArea";
 import Spacer from "../components/Spacer";
-import { useSelector } from "react-redux";
-import LoginSignupForm from "../components/LoginSignupForm";
 import Background from "../components/Background";
-import { updateLoginUsername, updateLoginPassword } from "../actions/loginActions";
 import screencap from "../api/screencap";
-import { login, logout, setToken } from "../actions/appStatusActions";
 import colors from "../enums/colors";
+import AppTextInput from "../components/AppTextInput";
+import AppButton from "../components/AppButton";
+import { authStorage } from "../persistingData/authStorage";
+import AuthContext from "../contexts/authContext";
 
-import messages from "../enums/messages";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 function LoginScreen({ navigation }) {
-  const { username, password } = useSelector((state) => {
-    return state.loginInfo;
-  });
-
+  const { userIsStored } = useContext(AuthContext);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loginNotSuccess, setLoginNotSuccess] = useState(false);
 
-  const isLoggedIn = useSelector((state) => state.appStatus.isLoggedIn);
+  useEffect(() => {
+    if (userIsStored) navigation.navigate("AppNavigator");
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("blur", () => {
+      setUsername("");
+      setPassword("");
+      setLoginNotSuccess(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const restoreUser = async (obj) => {
+    loginAction.updateUser(obj);
+    await authStorage.storeUser(obj);
+  };
 
   const onSubmit = async () => {
     const result = await screencap.post("/auth/login", {
       username: username,
       password: password
     });
-    const token = result.data.token;
+    const { token, nickname, email } = result.data;
+
     if (!token) setLoginNotSuccess(true);
     else {
-      login();
-      setToken(token);
-      navigation.navigate("NoteListScreen");
+      restoreUser({ token, username, nickname, email });
+      navigation.navigate("AppNavigator");
     }
-  };
-
-  const navigatorToSignup = () => {
-    navigation.navigate("SignupScreen");
   };
 
   return (
     <Background>
       <SafeArea style={styles.safeContainer}>
-        <Spacer height={10} />
-        <Image source={require("../assets/images/book.png")} style={styles.book} />
-        <AppText
-          style={{
-            alignSelf: "center",
-            height: 20,
-            justifyContent: "center",
-            color: colors.tomato
-          }}
-        >
-          {loginNotSuccess ? "Incorrect username or password" : ""}
-        </AppText>
-        <LoginSignupForm
-          setUsername={updateLoginUsername}
-          setPassword={updateLoginPassword}
-          onSubmit={onSubmit}
-          submitButtonTitle={"Login"}
-        />
-
-        <TouchableOpacity onPress={navigatorToSignup} styel={styles.text}>
-          <AppText style={styles.text}>You may click me to sign up.</AppText>
-        </TouchableOpacity>
+        <KeyboardAwareScrollView>
+          <Spacer height={10} />
+          <Image source={require("../assets/images/book.png")} style={styles.book} />
+          <AppText
+            style={{
+              alignSelf: "center",
+              height: 20,
+              justifyContent: "center",
+              color: colors.tomato
+            }}
+          >
+            {loginNotSuccess ? "Incorrect username or password" : ""}
+          </AppText>
+          <Spacer height={5} />
+          <AppTextInput
+            value={username}
+            icon="account-circle"
+            placeholder={"Username"}
+            onChangeText={setUsername}
+          />
+          <Spacer />
+          <AppTextInput
+            value={password}
+            icon="lock-open"
+            placeholder={"Password"}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <Spacer />
+          <AppButton
+            title={"Login"}
+            color={colors.deepBrown}
+            style={styles.button}
+            onPress={onSubmit}
+          />
+          <Spacer />
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("SignupScreen");
+            }}
+            styel={styles.text}
+          >
+            <AppText style={styles.text}>You may click me to sign up.</AppText>
+          </TouchableOpacity>
+        </KeyboardAwareScrollView>
       </SafeArea>
     </Background>
   );
@@ -97,6 +132,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150
   },
+  keyboardAvoidingView: { height: "100%" },
   safeContainer: { flex: 1, marginHorizontal: 15 },
   text: {
     alignSelf: "flex-end",

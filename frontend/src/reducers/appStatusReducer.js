@@ -1,6 +1,6 @@
 import actionNames from "../enums/actionNames";
 
-const initialState = { isLoggedIn: false, token: "", vocabs: [], pages: [], notes: [] };
+const initialState = { isLoggedIn: false, vocabs: [], pages: [], notes: [] };
 
 export default function appStatusReducer(state = initialState, action) {
   switch (action.type) {

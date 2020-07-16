@@ -1,4 +1,4 @@
-export default {
+export default Object.freeze({
   primary: "#fc5c65",
   secondary: "#4ecdc4",
   tomato: "tomato",
@@ -16,5 +16,6 @@ export default {
   dictBorder: "rgba(255,100,100,0.8)",
   brightBrown: "rgba(255,240,240,0.6)",
   bottomTabBar: "rgba(255,240,240,0.97)",
-  lowOpaBrightBrown: "rgba(249,247,240,0.8)"
-};
+  lowOpaBrightBrown: "rgba(249,247,240,0.8)",
+  lightBrown: "#8a9868"
+});

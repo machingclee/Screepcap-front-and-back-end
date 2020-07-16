@@ -6,71 +6,72 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from "react-native";
+
+import { useSelector } from "react-redux";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import AppText from "../components/AppText";
 import SafeArea from "../components/SafeArea";
 import Background from "../components/Background";
-import useVocabs from "../hooks/useVocabs";
-import { useSelector } from "react-redux";
 import uuid from "../utils/uuid";
 import Spacer from "../components/Spacer";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../enums/colors";
 import InfoRow from "../components/InfoRow";
-function NoteListScreen({ navigation }) {
-  const { fetchFinished } = useVocabs();
-  const { notes, pages, vocabs } = useSelector((state) => state.appStatus);
-  console.log(notes);
+import usetNotes from "../hooks/useNotes";
+import CanonicalActivityIndicator from "../components/CanonicalActivityIndicator";
 
-  const handleOnClick = (noteName) => () => {
-    navigation.navigate("VocabListScreen", { noteName });
+function NoteListScreen({ navigation }) {
+  const { fetchFinished } = usetNotes();
+  const { notes } = useSelector((state) => state.appStatus);
+
+  const handleNoteOnClick = ({ sqliteNoteId }) => () => {
+    navigation.navigate("VocabListScreen", { sqliteNoteId });
   };
 
   return (
-    <Background>
-      <SafeArea style={styles.safeContainer}>
-        <Spacer />
-        <InfoRow
-          rightContent={
-            <AppText style={styles.title} h2>
-              Notes
-            </AppText>
-          }
-        />
-        <Spacer height={10} />
-        {!fetchFinished && (
-          <View>
-            <Spacer />
-            <ActivityIndicator size="large" />
-          </View>
-        )}
+    <>
+      <CanonicalActivityIndicator visible={!fetchFinished} />
+      <Background>
+        <SafeArea style={styles.safeContainer}>
+          <Spacer />
+          <InfoRow
+            rightContent={
+              <AppText style={styles.title} h2>
+                Notes
+              </AppText>
+            }
+          />
+          <Spacer height={10} />
 
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={notes}
-          keyExtractor={(item) => {
-            return uuid();
-          }}
-          renderItem={({ item, index }) => {
-            return (
-              <TouchableOpacity
-                onPress={handleOnClick(item)}
-                style={styles.buttonContainer}
-              >
-                <View style={styles.note}>
-                  <AppText style={styles.noteName}>{item}</AppText>
-                  <MaterialCommunityIcons
-                    name="arrow-right-circle"
-                    size={32}
-                    color={colors.medium}
-                  />
-                </View>
-                <Spacer height={8} />
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </SafeArea>
-    </Background>
+          <FlatList
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+            data={notes}
+            keyExtractor={(item) => {
+              return uuid();
+            }}
+            renderItem={({ item, index }) => {
+              return (
+                <TouchableOpacity
+                  onPress={handleNoteOnClick({ sqliteNoteId: item.sqliteId })}
+                  style={styles.buttonContainer}
+                >
+                  <View style={styles.note}>
+                    <AppText style={styles.noteName}>{item.name}</AppText>
+                    <MaterialCommunityIcons
+                      name="arrow-right-circle"
+                      size={32}
+                      color={colors.medium}
+                    />
+                  </View>
+                  <Spacer height={8} />
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </SafeArea>
+      </Background>
+    </>
   );
 }
 

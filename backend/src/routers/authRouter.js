@@ -2,6 +2,7 @@ import express from "express";
 import { hashing, compare } from "../Utils/bcrypt/index";
 import { checkUserIdentity } from "../services/authServices";
 import User from "../database/models/User";
+
 import messages from "../enums/messages";
 import passport from "passport";
 import { issueJWT } from "../Utils/JWT/index";

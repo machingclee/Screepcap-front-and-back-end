@@ -4,54 +4,48 @@ import {
   View,
   StyleSheet,
   FlatList,
-  Animated,
   TouchableOpacity,
-  ActivityIndicator,
-  Image
+  Image,
+  ActivityIndicator
 } from "react-native";
-
 import Modal from "react-native-modal";
-import AppText from "../components/AppText";
-import SafeArea from "../components/SafeArea";
 import ListSeparator from "../components/ListSeparator";
-import screencap from "../api/screencap";
+import AppText from "../components/AppText";
 import colors from "../enums/colors";
 import Background from "../components/Background";
-import { setVocabs } from "../actions/appStatusActions";
 import VocabCard from "../components/VocabCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ReactNativeZoomableView from "@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView";
-import useVocabs from "../hooks/useVocabs";
 import Spacer from "../components/Spacer";
 import permutation from "../utils/permutation";
-import InfoRow from "../components/InfoRow";
+import { setSearch } from "../actions/searchFieldAction";
+import useVocabs from "../hooks/useVocabs";
+import CanonicalActivityIndicator from "../components/CanonicalActivityIndicator";
 
-function VocabListScreen({ navigation }) {
-  const { notes, pages, vocabs } = useSelector((state) => state.appStatus);
-  const [currentNoteName, setCurrentNoteName] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
+// import CircleActivityLoader from "../components/CircleActivityLoader";
+function VocabListScreen({ navigation, route }) {
+  const { sqliteNoteId } = route.params;
+
   const [currentVocabs, setCurrentVocabs] = useState([]);
-  const noteName = navigation.state.params.noteName;
-  console.log(noteName);
+
+  const { fetchFinished } = useVocabs({ sqliteNoteId });
+  const { vocabs } = useSelector((state) => state.appStatus);
+  const { username } = useSelector((state) => state.login);
+  const { searchKey } = useSelector((state) => state.searchField);
 
   useEffect(() => {
-    if (noteName) {
-      setCurrentNoteName(noteName);
-      setCurrentVocabs(
-        [...vocabs].filter((vocab) => {
-          return vocab.page.note.name === noteName;
-        })
-      );
-    }
-  }, [noteName]);
+    setSearch("");
+    setCurrentVocabs(vocabs);
+  }, [vocabs, sqliteNoteId]);
 
+  const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const [showSpin, setShowSpin] = useState(true);
 
-  const getS3URL = (name) => {
-    const s3Uri =
-      "https://screencapdicscreenshots.s3-ap-southeast-1.amazonaws.com/cclee/" + name;
+  const getS3URL = (imgName) => {
+    const s3Uri = `https://screencapdicscreenshots.s3-ap-southeast-1.amazonaws.com/${username}/${imgName}`;
+                  `https://screencapdicscreenshots.s3-ap-southeast-1.amazonaws.com/cclee/__cropped__image-129.png`
     return s3Uri;
   };
 
@@ -66,73 +60,99 @@ function VocabListScreen({ navigation }) {
     setShowSpin(false);
   };
 
-  return (
-    <Background>
-      <View style={styles.container}>
-        <Spacer />
-        <Spacer />
-        <Spacer />
-        <FlatList
-          data={currentVocabs}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => {
-            return (
-              <>
-                <VocabCard
-                  item={item}
-                  onPress={() => {
-                    setModalImage(item.page.croppedScreenshot);
-                    toggleModal();
-                    startSpinning();
-                  }}
-                />
-              </>
-            );
-          }}
-          ItemSeparatorComponent={() => <ListSeparator />}
-          refreshing={refreshing}
-          onRefresh={() => {
-            setCurrentVocabs(
-              permutation(currentVocabs.length).map((index) => {
-                return currentVocabs[index];
-              })
-            );
-          }}
-        />
+  const permuteVocabs = () => {
+    setCurrentVocabs(
+      permutation(currentVocabs.length).map((index) => {
+        return currentVocabs[index];
+      })
+    );
+  };
 
-        <Modal
-          isVisible={showModal}
-          swipeDirection="down"
-          swipeThreshold={100}
-          onSwipeComplete={toggleModal}
-          style={{ margin: 0 }}
-        >
-          <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-            <MaterialCommunityIcons
-              name="close-circle-outline"
-              color={colors.white}
-              size={30}
+  const searchVocabs = () => {
+    if (searchKey !== "") {
+      const regex = new RegExp(searchKey, "i");
+      setCurrentVocabs(
+        vocabs.filter((vocab) => {
+          return regex.test(vocab.explanation + vocab.word + vocab.pronounciation);
+        })
+      );
+    } else {
+      setCurrentVocabs(vocabs);
+    }
+  };
+
+  useEffect(() => {
+    searchVocabs();
+  }, [searchKey]);
+
+  return (
+    <>
+      <CanonicalActivityIndicator visible={!fetchFinished} />
+      <Background>
+        <View style={styles.container}>
+          {vocabs.length === 0 && fetchFinished ? (
+            <AppText style={styles.noVocab}>No vocab was created for this note.</AppText>
+          ) : null}
+
+          {fetchFinished && (
+            <FlatList
+              data={currentVocabs}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item, index }) => {
+                return (
+                  <>
+                    <VocabCard
+                      item={item}
+                      onPress={() => {
+                        setModalImage(item.croppedScreenshot);
+                        toggleModal();
+                        startSpinning();
+                      }}
+                    />
+                  </>
+                );
+              }}
+              ItemSeparatorComponent={() => <ListSeparator />}
+              refreshing={refreshing}
+              onRefresh={permuteVocabs}
             />
-          </TouchableOpacity>
-          <View style={styles.activityIndicator}>
-            {showSpin && <ActivityIndicator size="large" />}
-          </View>
-          <ReactNativeZoomableView
-            maxZoom={1.5}
-            minZoom={1}
-            initialZoom={1}
-            bindToBorders={false}
-            captureEvent={true}
+          )}
+
+          <Modal
+            isVisible={showModal}
+            swipeDirection="down"
+            swipeThreshold={100}
+            onSwipeComplete={toggleModal}
+            style={{ margin: 0 }}
           >
-            <Image
-              onLoadEnd={stopSpinning}
-              source={{ uri: getS3URL(modalImage) }}
-              style={styles.modalImage}
-            />
-          </ReactNativeZoomableView>
-        </Modal>
-      </View>
-    </Background>
+            <>
+              <CanonicalActivityIndicator visible={showSpin} />
+              <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
+                <MaterialCommunityIcons
+                  name="close-circle-outline"
+                  color={colors.white}
+                  size={30}
+                />
+              </TouchableOpacity>
+              <View style={styles.activityIndicator}></View>
+              <ReactNativeZoomableView
+                maxZoom={1.5}
+                minZoom={1}
+                initialZoom={1}
+                bindToBorders={false}
+                captureEvent={true}
+              >
+                <Image
+                  onLoadEnd={stopSpinning}
+                  source={{ uri: getS3URL(modalImage) }}
+                  style={styles.modalImage}
+                />
+              </ReactNativeZoomableView>
+            </>
+          </Modal>
+        </View>
+      </Background>
+    </>
   );
 }
 
@@ -171,6 +191,7 @@ const styles = StyleSheet.create({
     width: "100%",
     resizeMode: "contain"
   },
+  noVocab: { marginHorizontal: 10, marginTop: 10 },
   safeContainer: { flex: 1, marginTop: 0 },
   textContainer: { flexDirection: "row", justifyContent: "space-between" },
   pronounciation: { color: colors.tomato, fontWeight: "bold" },
@@ -181,13 +202,5 @@ const styles = StyleSheet.create({
   },
   word: { fontSize: 28, color: colors.dark, fontWeight: "bold" }
 });
-
-VocabListScreen.navigationOptions = () => {
-  // To see all the options, see
-  // https://reactnavigation.org/docs/stack-navigator/
-  return {
-    headerShown: false
-  };
-};
 
 export default VocabListScreen;

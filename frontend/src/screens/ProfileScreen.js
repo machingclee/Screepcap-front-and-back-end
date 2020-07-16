@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, SafeAreaView, Image, FlatList } from "react-native";
 import { useSelector } from "react-redux";
 import AppText from "../components/AppText";
@@ -8,15 +8,20 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Spacer from "../components/Spacer";
 import colors from "../enums/colors";
 import InfoRow from "../components/InfoRow";
-import { logout as appStatusLogout } from "../actions/appStatusActions";
+import { loginAction } from "../actions/loginActions";
+import { authStorage } from "../persistingData/authStorage";
+import AuthContext from "../contexts/authContext";
 
 function ProfileScreen({ navigation }) {
-  const { username } = useSelector((state) => {
-    return state.loginInfo;
+  const { setUserIsStored } = useContext(AuthContext);
+  const { username, nickname, email } = useSelector((state) => {
+    return state.login;
   });
 
   const logout = () => {
-    appStatusLogout();
+    loginAction.logout();
+    authStorage.removeUser();
+    setUserIsStored(false);
     navigation.navigate("LoginScreen");
   };
 
@@ -47,9 +52,12 @@ function ProfileScreen({ navigation }) {
             />
           }
           rightContent={
-            <AppText style={styles.userName}>
-              {username ? username : "TestingAccount"}
-            </AppText>
+            <View>
+              <AppText style={styles.userName}>
+                {username ? nickname : "TestingAccount"}
+              </AppText>
+              <AppText style={styles.email}>{email ? email : "TestingAccount"}</AppText>
+            </View>
           }
         />
         <Spacer />
@@ -89,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
   container: { flex: 1 },
-
+  email: { fontSize: 15, color: colors.dark },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",

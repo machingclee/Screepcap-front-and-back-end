@@ -1,16 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { View, Text, StyleSheet, SafeAreaView, Image } from "react-native";
 import Spacer from "./Spacer";
 import AppButton from "../components/AppButton";
 import AppTextInput from "../components/AppTextInput";
 import colors from "../enums/colors";
-function LoginSignupForm({
-  setUsername,
-  setPassword,
-  onSubmit,
-  submitButtonTitle,
-  username
-}) {
+
+function LoginSignupForm({ setUsername, setPassword, onSubmit, submitButtonTitle }) {
   return (
     <View style={styles.container}>
       <Spacer height={5} />
@@ -25,16 +21,14 @@ function LoginSignupForm({
         placeholder={"Password"}
         onChangeText={setPassword}
         secureTextEntry
-        textContentType="newPassword"
       />
-      <Spacer height={10} />
+
       <AppButton
         title={submitButtonTitle}
         color={colors.deepBrown}
         style={styles.button}
         onPress={onSubmit}
       />
-      <Spacer height={10} />
     </View>
   );
 }

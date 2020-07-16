@@ -1,28 +1,29 @@
-import { Expo } from 'expo-server-sdk';
- 
+import { Expo } from "expo-server-sdk";
+
 // Create a new Expo SDK client
 let expo = new Expo();
- 
+
 // Create the messages that you want to send to clents
 let messages = [];
+
 for (let pushToken of somePushTokens) {
   // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
- 
+
   // Check that all your push tokens appear to be valid Expo push tokens
   if (!Expo.isExpoPushToken(pushToken)) {
     console.error(`Push token ${pushToken} is not a valid Expo push token`);
     continue;
   }
- 
+
   // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications)
   messages.push({
     to: pushToken,
-    sound: 'default',
-    body: 'This is a test notification',
-    data: { withSome: 'data' },
-  })
+    sound: "default",
+    body: "This is a test notification",
+    data: { withSome: "data" }
+  });
 }
- 
+
 // The Expo push notification service accepts batches of notifications so
 // that you don't need to send 1000 requests to send 1000 notifications. We
 // recommend you batch your notifications to reduce the number of requests
@@ -48,9 +49,7 @@ let tickets = [];
     }
   }
 })();
- 
-...
- 
+
 // Later, after the Expo push notification service has delivered the
 // notifications to Apple or Google (usually quickly, but allow the the service
 // up to 30 minutes when under load), a "receipt" for each notification is
@@ -74,7 +73,7 @@ for (let ticket of tickets) {
     receiptIds.push(ticket.id);
   }
 }
- 
+
 let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
 (async () => {
   // Like sending notifications, there are different strategies you could use
@@ -83,17 +82,15 @@ let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
     try {
       let receipts = await expo.getPushNotificationReceiptsAsync(chunk);
       console.log(receipts);
- 
+
       // The receipts specify whether Apple or Google successfully received the
       // notification and information about an error, if one occurred.
       for (let receiptId in receipts) {
         let { status, message, details } = receipts[receiptId];
-        if (status === 'ok') {
+        if (status === "ok") {
           continue;
-        } else if (status === 'error') {
-          console.error(
-            `There was an error sending a notification: ${message}`
-          );
+        } else if (status === "error") {
+          console.error(`There was an error sending a notification: ${message}`);
           if (details && details.error) {
             // The error codes are listed in the Expo documentation:
             // https://docs.expo.io/versions/latest/guides/push-notifications/#individual-errors
@@ -107,4 +104,3 @@ let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
     }
   }
 })();
- 

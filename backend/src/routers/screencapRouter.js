@@ -68,13 +68,16 @@ async function getVocabs(req, res) {
 async function uploadVocabs(req, res) {
   const { Notes, Pages, Vocabs } = req.body;
   const USER_ID = req.user.id;
+  try {
+    await screencapService.insertNotes(Notes, USER_ID);
+    await screencapService.insertPages(Pages);
+    await screencapService.insertVocabs(Vocabs);
 
-  await screencapService.insertNotes(Notes, USER_ID);
-  await screencapService.insertPages(Pages);
-  await screencapService.insertVocabs(Vocabs);
-
-  console.log(Notes.length, Pages.length, Vocabs.length);
-  res.json({ message: "done" });
+    console.log(Notes.length, Pages.length, Vocabs.length);
+    res.json({ message: "done" });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
 }
 
 export default router;

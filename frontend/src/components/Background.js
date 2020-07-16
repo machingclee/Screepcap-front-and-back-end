@@ -22,9 +22,7 @@ function Background({ children }) {
 }
 
 const styles = StyleSheet.create({
-  background: { width: "100%", flex: 1 },
-  container: { flex: 1 },
-  safeContainer: { flex: 1, margin: 10 }
+  background: { width: "100%", flex: 1 }
 });
 
 export default Background;

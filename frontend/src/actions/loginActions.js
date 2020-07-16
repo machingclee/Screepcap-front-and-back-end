@@ -14,3 +14,47 @@ export function updateLoginPassword(password) {
     payload: password
   });
 }
+
+function updateLoginNickname(nickname) {
+  store.dispatch({
+    type: actionNames.updateNickname,
+    payload: nickname
+  });
+}
+
+function updateLoginEmail(email) {
+  store.dispatch({
+    type: actionNames.updateEmail,
+    payload: email
+  });
+}
+
+function updateLoginToken(token) {
+  store.dispatch({
+    type: actionNames.setToken,
+    payload: token
+  });
+}
+
+function logout() {
+  store.dispatch({
+    type: actionNames.logout
+  });
+}
+
+function updateUser(user) {
+  store.dispatch({
+    type: actionNames.updateUser,
+    payload: user
+  });
+}
+
+export const loginAction = {
+  updateLoginUsername,
+  updateLoginPassword,
+  updateLoginNickname,
+  updateLoginEmail,
+  updateLoginToken,
+  logout,
+  updateUser
+};

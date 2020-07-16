@@ -1,91 +1,53 @@
-import React from "react";
-import { View, StatusBar, Image, ImageBackground, StyleSheet } from "react-native";
-
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
-import { createBottomTabNavigator } from "react-navigation-tabs";
-import { setNavigator } from "./src/helpers/navigationRef";
+import React, { useState, useEffect } from "react";
+import { StyleSheet } from "react-native";
 import { Provider as ReduxStoreProvider } from "react-redux";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { BlurView } from "@react-native-community/blur";
 import store from "./store";
 
-import LoginScreen from "./src/screens/LoginScreen";
-import SignupScreen from "./src/screens/SignupScreen";
-import VocabListScreen from "./src/screens/VocabListScreen";
-import ProfileScreen from "./src/screens/ProfileScreen";
-import NoteListScreen from "./src/screens/NoteListScreen";
-import colors from "./src/enums/colors";
+import LoginNavigator from "./src/navigation/LoginNavigator";
+import { NavigationContainer } from "@react-navigation/native";
+import { authStorage } from "./src/persistingData/authStorage";
+import { loginAction } from "./src/actions/loginActions";
+import { AppLoading } from "expo";
 
-const loginFlow = createStackNavigator({
-  LoginScreen: LoginScreen,
-  SignupScreen: SignupScreen
-});
-
-const tabBarOptions = {
-  showLabel: false,
-  activeTintColor: "blue",
-  inactiveTintColor: "#bdb1cc",
-  style: {
-    backgroundColor: colors.bottomTabBar,
-    borderTopWidth: 0.5,
-    borderTopColor: "rgba(0,0,0,0.5)",
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0
-  }
-};
-
-const mainFlow = createBottomTabNavigator(
-  {
-    vocabFlow: {
-      screen: createStackNavigator({
-        NoteListScreen: NoteListScreen,
-        VocabListScreen: VocabListScreen
-      }),
-      navigationOptions: {
-        tabBarLabel: "Vocabs",
-        tabBarIcon: (props) => {
-          console.log(props);
-          return (
-            <MaterialCommunityIcons
-              name="format-list-bulleted-square"
-              size={25}
-              color={props.tintColor}
-            />
-          );
-        }
-      }
-    },
-    ProfileScreen: {
-      screen: ProfileScreen,
-      navigationOptions: {
-        tabBarLabel: "Profile",
-        tabBarIcon: ({ tintColor }) => (
-          <MaterialCommunityIcons name="account-circle" size={25} color={tintColor} />
-        )
-      }
-    }
-  },
-  { tabBarOptions }
-);
-
-const switchNavigator = createSwitchNavigator({
-  loginFlow,
-  mainFlow
-});
-
-const AppContainer = createAppContainer(switchNavigator);
+import AuthContext from "./src/contexts/authContext";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { navigationRef } from "./src/navigation/rootNavigation";
 
 export default App = () => {
-  return (
-    <ReduxStoreProvider store={store} style={styles.background}>
-      <AppContainer
-        ref={(navigator) => {
-          setNavigator(navigator);
+  const netInfo = useNetInfo();
+
+  const [userIsStored, setUserIsStored] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  const restoreUser = async () => {
+    const user = await authStorage.getUser();
+    if (!user) return;
+
+    loginAction.updateUser(user);
+    setUserIsStored(true);
+  };
+
+  useEffect(() => {
+    restoreUser();
+  }, []);
+
+  if (!isReady)
+    return (
+      <AppLoading
+        startAsync={restoreUser}
+        onFinish={() => {
+          setIsReady(true);
         }}
       />
+    );
+
+  return (
+    <ReduxStoreProvider store={store} style={styles.background}>
+      <AuthContext.Provider value={{ userIsStored, setUserIsStored }}>
+        <NavigationContainer ref={navigationRef}>
+          <LoginNavigator userIsStored={userIsStored} />
+        </NavigationContainer>
+      </AuthContext.Provider>
     </ReduxStoreProvider>
   );
 };
